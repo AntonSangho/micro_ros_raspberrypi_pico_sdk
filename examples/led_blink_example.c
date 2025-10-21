@@ -10,15 +10,21 @@
 #include "pico/stdlib.h"
 #include "pico_uart_transports.h"
 
-const uint LED_PIN = 25;
+// 외부 LED용 GPIO 핀
+const uint LED_PIN = 20;
 
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
+bool led_state = false;
 
 void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
 {
     rcl_ret_t ret = rcl_publish(&publisher, &msg, NULL);
     msg.data++;
+
+    // LED 깜박임 (외부 GPIO 사용)
+    led_state = !led_state;
+    gpio_put(LED_PIN, led_state);
 }
 
 int main()
@@ -32,6 +38,7 @@ int main()
 		pico_serial_transport_read
 	);
 
+    // 외부 LED GPIO 초기화
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
@@ -72,8 +79,6 @@ int main()
 
     rclc_executor_init(&executor, &support.context, 1, &allocator);
     rclc_executor_add_timer(&executor, &timer);
-
-    gpio_put(LED_PIN, 1);
 
     msg.data = 0;
     while (true)
