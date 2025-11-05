@@ -1,8 +1,8 @@
-# CLAUDE.md
+# 프로젝트 개요
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+이 문서는 Raspberry Pi Pico W + micro-ROS 프로젝트의 아키텍처, 빌드 시스템, 주요 구성요소에 대한 상세 설명을 제공합니다.
 
-## 프로젝트 개요
+## 소개
 
 이 저장소는 Pico SDK를 사용하여 Raspberry Pi Pico에서 micro-ROS를 지원합니다. 미리 컴파일된 micro-ROS 라이브러리와 퍼블리셔/구독자 패턴을 보여주는 예제 코드를 제공하여 RP2040 기반 마이크로컨트롤러에서 ROS 2 애플리케이션을 실행할 수 있게 합니다.
 
