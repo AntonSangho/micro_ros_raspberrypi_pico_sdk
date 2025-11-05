@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
+# Pico W 보드 설정 (내부 LED 사용을 위해 필요) - pico_sdk_import 전에 설정해야 함
+set(PICO_BOARD pico_w CACHE STRING "Board type")
+
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 project(pico_micro_ros_example C CXX ASM)
@@ -39,6 +42,28 @@ function(add_micro_ros_executable NAME SOURCE_FILE)
     pico_add_extra_outputs(${NAME})
 endfunction()
 
+# CYW43 지원이 필요한 실행파일을 위한 함수 (내부 LED 사용)
+function(add_micro_ros_executable_with_cyw43 NAME SOURCE_FILE)
+    add_executable(${NAME}
+        ${SOURCE_FILE}
+        pico_uart_transport.c
+    )
+    target_link_libraries(${NAME}
+        pico_stdlib
+        pico_cyw43_arch_none
+        microros
+    )
+    target_include_directories(${NAME} PUBLIC
+        libmicroros/include
+        ${CMAKE_SOURCE_DIR}  # 프로젝트 루트 디렉토리 (pico_uart_transports.h 위치)
+    )
+    # Configure Pico
+    pico_enable_stdio_usb(${NAME} 1)
+    pico_enable_stdio_uart(${NAME} 0)
+    # Generate UF2
+    pico_add_extra_outputs(${NAME})
+endfunction()
+
 # 빌드할 예제 선택
 # 원하는 예제만 주석 해제하세요
 
@@ -46,5 +71,5 @@ endfunction()
 add_micro_ros_executable(pico_micro_ros_example pico_micro_ros_example.c)
 
 # Examples 디렉토리의 예제들
-# add_micro_ros_executable(led_blink_example examples/led_blink_example.c)
+add_micro_ros_executable_with_cyw43(led_blink_example examples/led_blink_example.c)
 #add_micro_ros_executable(hcsr04_distance_example examples/hcsr04_distance_example.c)

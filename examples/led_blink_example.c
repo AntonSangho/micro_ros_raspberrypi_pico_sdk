@@ -8,10 +8,8 @@
 #include <rmw_microros/rmw_microros.h>
 
 #include "pico/stdlib.h"
+#include "pico/cyw43_arch.h"
 #include "pico_uart_transports.h"
-
-// 외부 LED용 GPIO 핀
-const uint LED_PIN = 20;
 
 rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
@@ -22,13 +20,18 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
     rcl_ret_t ret = rcl_publish(&publisher, &msg, NULL);
     msg.data++;
 
-    // LED 깜박임 (외부 GPIO 사용)
+    // LED 깜박임 (내부 CYW43 LED 사용)
     led_state = !led_state;
-    gpio_put(LED_PIN, led_state);
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_state);
 }
 
 int main()
 {
+    // CYW43 아키텍처 초기화 (내부 LED 사용을 위해 필요)
+    if (cyw43_arch_init()) {
+        return -1;
+    }
+
     rmw_uros_set_custom_transport(
 		true,
 		NULL,
@@ -37,10 +40,6 @@ int main()
 		pico_serial_transport_write,
 		pico_serial_transport_read
 	);
-
-    // 외부 LED GPIO 초기화
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
 
     rcl_timer_t timer;
     rcl_node_t node;
