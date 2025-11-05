@@ -43,8 +43,8 @@ endfunction()
 # 원하는 예제만 주석 해제하세요
 
 # 기본 예제
-#add_micro_ros_executable(pico_micro_ros_example pico_micro_ros_example.c)
+add_micro_ros_executable(pico_micro_ros_example pico_micro_ros_example.c)
 
 # Examples 디렉토리의 예제들
 # add_micro_ros_executable(led_blink_example examples/led_blink_example.c)
-add_micro_ros_executable(hcsr04_distance_example examples/hcsr04_distance_example.c)
+#add_micro_ros_executable(hcsr04_distance_example examples/hcsr04_distance_example.c)
