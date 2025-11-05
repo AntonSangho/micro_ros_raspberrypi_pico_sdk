@@ -4,6 +4,9 @@
 
 #include <uxr/client/profile/transport/custom/custom_transport.h>
 
+// 내장 LED 핀 (Raspberry Pi Pico)
+const uint ONBOARD_LED_PIN = 25;
+
 void usleep(uint64_t us)
 {
     sleep_us(us);
@@ -24,6 +27,12 @@ bool pico_serial_transport_open(struct uxrCustomTransport * transport)
     if(require_init)
     {
         stdio_init_all();
+
+        // 내장 LED 초기화
+        gpio_init(ONBOARD_LED_PIN);
+        gpio_set_dir(ONBOARD_LED_PIN, GPIO_OUT);
+        gpio_put(ONBOARD_LED_PIN, 0);  // LED 끄기
+
         require_init = false;
     }
 
@@ -67,6 +76,9 @@ size_t pico_serial_transport_read(struct uxrCustomTransport * transport, uint8_t
             return i;
         }
         buf[i] = character;
+
+        // 데이터 수신 시 LED 토글
+        gpio_put(ONBOARD_LED_PIN, !gpio_get(ONBOARD_LED_PIN));
     }
     return len;
 }
